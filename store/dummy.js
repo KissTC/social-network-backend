@@ -5,23 +5,29 @@ const db = {
 };
 
 async function list(tabla) {
-    return db[tabla];
+    return db[tabla] || [];
 }
 
 async function get(tabla, id) {
     let collection = await list(tabla);
-    console.log(tabla);
-    console.log(collection);
     return collection.filter( item => item.id === id)[0] || null;
 }
 
 async function upsert(tabla, data) {
-    const newData = {
-        id: db[tabla].length + 1,
-        data: data.name,
+    if (!db[tabla]) {
+        db[tabla] = [];
     }
-    db[tabla].push(newData);
-    return newData;
+    
+    db[tabla].push(data);
+ 
+    console.log(db);
+}
+
+async function query(tabla, q) {
+    let collection = await list(tabla);
+    let keys = Object.keys(q);
+    let key = keys[0];
+    return collection.filter( item => item[key] === q[key])[0] || null;
 }
 
 async function remove(tabla, id) {
@@ -32,5 +38,6 @@ module.exports = {
     list,
     get, 
     upsert,
-    remove
+    remove,
+    query
 }
